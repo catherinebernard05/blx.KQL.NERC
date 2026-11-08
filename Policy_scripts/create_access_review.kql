@@ -1,0 +1,27 @@
+AuditLogs
+| where TimeGenerated > ago(90d)
+| where Category == "Policy"
+| where OperationName == "Create access review"
+| extend TargetResourceName =
+case(
+tolower(tostring(TargetResources[0].type)) == "accessreview", tostring(TargetResources[0].displayName),
+tolower(tostring(TargetResources[1].type)) == "accessreview", tostring(TargetResources[1].displayName),
+tolower(tostring(TargetResources[2].type)) == "accessreview", tostring(TargetResources[2].displayName),
+""
+)
+| extend TargetResourceType =
+case(
+tolower(tostring(TargetResources[0].type)) == "accessreview", tostring(TargetResources[0].type),
+tolower(tostring(TargetResources[1].type)) == "accessreview", tostring(TargetResources[1].type),
+tolower(tostring(TargetResources[2].type)) == "accessreview", tostring(TargetResources[2].type),
+""
+)
+| project
+    TimeGenerated,
+    LoggedByService,
+    TargetResourceName,
+    TargetResourceType,
+    Result,
+    ActivityDisplayName,
+    OperationName
+| order by TimeGenerated desc

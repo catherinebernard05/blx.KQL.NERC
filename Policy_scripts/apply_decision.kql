@@ -1,0 +1,19 @@
+AuditLogs
+| where TimeGenerated > ago(90d)
+| where Category == "Policy"
+| where OperationName == "Apply decision"
+| extend ApplyResult = tostring(AdditionalDetails[0].value)
+| extend InitiatedBy = tostring(InitiatedBy.app.displayName) 
+| extend TargetResource = tostring(TargetResources[0].displayName)
+| extend TargetResourceType = tostring(TargetResources[0].type)
+| project
+    TimeGenerated,
+    Identity,
+    InitiatedBy,
+    LoggedByService,
+    TargetResource,
+    TargetResourceType,
+    Result,
+    ApplyResult,
+    OperationName
+| order by TimeGenerated desc

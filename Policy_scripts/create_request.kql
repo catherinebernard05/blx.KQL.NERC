@@ -1,0 +1,52 @@
+AuditLogs
+| where TimeGenerated > ago(90d)
+| where Category == "Policy"
+| where OperationName == "Create request"
+| extend TargetResourceName =
+case(
+tolower(tostring(TargetResources[0].type)) == "accessreview", tostring(TargetResources[0].displayName),
+tolower(tostring(TargetResources[1].type)) == "accessreview", tostring(TargetResources[1].displayName),
+tolower(tostring(TargetResources[2].type)) == "accessreview", tostring(TargetResources[2].displayName),
+""
+)
+| extend TargetResourceType =
+case(
+tolower(tostring(TargetResources[0].type)) == "accessreview", tostring(TargetResources[0].type),
+tolower(tostring(TargetResources[1].type)) == "accessreview", tostring(TargetResources[1].type),
+tolower(tostring(TargetResources[2].type)) == "accessreview", tostring(TargetResources[2].type),
+""
+)
+| extend TargetUser =
+case(
+tolower(tostring(TargetResources[0].type)) == "user", tostring(TargetResources[0].displayName),
+tolower(tostring(TargetResources[1].type)) == "user", tostring(TargetResources[1].displayName),
+tolower(tostring(TargetResources[2].type)) == "user", tostring(TargetResources[2].displayName),
+""
+)
+| extend TargetUserEmail =
+case(
+tolower(tostring(TargetResources[0].type)) == "user", tostring(TargetResources[0].userPrincipalName),
+tolower(tostring(TargetResources[1].type)) == "user", tostring(TargetResources[1].userPrincipalName),
+tolower(tostring(TargetResources[2].type)) == "user", tostring(TargetResources[2].userPrincipalName),
+""
+)
+| extend TargetUserType =
+case(
+tolower(tostring(TargetResources[0].type)) == "user", tolower(tostring(TargetResources[0].type)),
+tolower(tostring(TargetResources[1].type)) == "user", tolower(tostring(TargetResources[1].type)),
+tolower(tostring(TargetResources[2].type)) == "user", tolower(tostring(TargetResources[2].type)),
+"Other"
+)
+| project
+    TimeGenerated,
+    Identity,
+    LoggedByService,
+    TargetResourceName,
+    TargetResourceType,
+    TargetUser,
+    TargetUserEmail,
+    TargetUserType,
+    Result,
+    ActivityDisplayName,
+    OperationName
+| order by TimeGenerated desc
