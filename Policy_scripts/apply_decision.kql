@@ -4,14 +4,14 @@ AuditLogs
 | where OperationName == "Apply decision"
 | extend ApplyResult = tostring(AdditionalDetails[0].value)
 | extend InitiatedBy = tostring(InitiatedBy.app.displayName) 
-| extend TargetResource = tostring(TargetResources[0].displayName)
+| extend TargetResourceName = tostring(TargetResources[0].displayName)
 | extend TargetResourceType = tostring(TargetResources[0].type)
 | project
     TimeGenerated,
     Identity,
     InitiatedBy,
     LoggedByService,
-    TargetResource,
+    TargetResourceName,
     TargetResourceType,
     Result,
     ApplyResult,
