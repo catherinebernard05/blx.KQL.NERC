@@ -1,0 +1,27 @@
+AuditLogs
+| where TimeGenerated > ago(90d)
+| where Category == "Policy"
+| where OperationName == "Update access review"
+| extend TargetResourceType = TargetResources[0].type
+| extend TargetResource = TargetResources[0].displayName
+| extend OldResourceName = TargetResources[0].modifiedProperties[0].oldValue
+| extend NewResourceName = TargetResources[0].modifiedProperties[0].newValue
+| extend OldResourceDescription = TargetResources[0].modifiedProperties[1].oldValue
+| extend NewResourceDescription = TargetResources[0].modifiedProperties[1].newValue
+| extend OldPolicy = TargetResources[0].modifiedProperties[3].oldValue
+| extend NewPolicy = TargetResources[0].modifiedProperties[3].newValue
+| project
+    TimeGenerated,
+    TargetResourceType,
+    TargetResource,
+    OldResourceName,
+    NewResourceName,
+    OldResourceDescription,
+    NewResourceDescription,
+    OldPolicy,
+    NewPolicy,
+    Result,
+    LoggedByService,
+    AADOperationType,
+    OperationName
+| order by TimeGenerated desc

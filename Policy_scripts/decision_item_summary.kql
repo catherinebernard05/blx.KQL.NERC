@@ -2,74 +2,42 @@ AuditLogs
 | where TimeGenerated > ago(90d)
 | where Category == "Policy"
 | where OperationName == "Decision Item Summary"
-| 
-| 
-| 
-| 
-| 
-| 
-| 
-| 
-| We are here
-| 
-| 
-| 
-| 
-| 
-| 
-| extend Justification = tostring(AdditionalDetails[0].value)
-| extend InitiatedBy_User = InitiatedBy.user.displayName
-| extend InitiatedBy_UserEmail = InitiatedBy.user.userPrincipalName
-| extend InitiatedBy_UserType = InitiatedBy.user.Member
-| extend TargetResource =
-case(
-tolower(tostring(TargetResources[0].type)) == "accessreview", tostring(TargetResources[0].displayName),
-tolower(tostring(TargetResources[1].type)) == "accessreview", tostring(TargetResources[1].displayName),
-tolower(tostring(TargetResources[2].type)) == "accessreview", tostring(TargetResources[2].displayName),
-""
-)
-| extend TargetResourceType =
-case(
-tolower(tostring(TargetResources[0].type)) == "accessreview", tostring(TargetResources[0].type),
-tolower(tostring(TargetResources[1].type)) == "accessreview", tostring(TargetResources[1].type),
-tolower(tostring(TargetResources[2].type)) == "accessreview", tostring(TargetResources[2].type),
-""
-)
-| extend TargetUser =
-case(
-tolower(tostring(TargetResources[0].type)) == "user", tostring(TargetResources[0].displayName),
-tolower(tostring(TargetResources[1].type)) == "user", tostring(TargetResources[1].displayName),
-tolower(tostring(TargetResources[2].type)) == "user", tostring(TargetResources[2].displayName),
-""
-)
-| extend TargetUserEmail =
-case(
-tolower(tostring(TargetResources[0].type)) == "user", tostring(TargetResources[0].userPrincipalName),
-tolower(tostring(TargetResources[1].type)) == "user", tostring(TargetResources[1].userPrincipalName),
-tolower(tostring(TargetResources[2].type)) == "user", tostring(TargetResources[2].userPrincipalName),
-""
-)
-| extend TargetUserType =
-case(
-tolower(tostring(TargetResources[0].type)) == "user", tolower(tostring(TargetResources[0].type)),
-tolower(tostring(TargetResources[1].type)) == "user", tolower(tostring(TargetResources[1].type)),
-tolower(tostring(TargetResources[2].type)) == "user", tolower(tostring(TargetResources[2].type)),
-"Other"
-)
+| extend ReviewType = AdditionalDetails[1].value
+| extend ResourceName = AdditionalDetails[2].value
+| extend ReviewName = AdditionalDetails[4].value
+| extend ReviewStatus = AdditionalDetails[8].value
+| extend ResourceOwnerName = AdditionalDetails[10].value
+| extend ResourceOwnerEmail = AdditionalDetails[11].value
+| extend TargetUser = AdditionalDetails[13].value
+| extend TargetUserEmail = AdditionalDetails[14].value
+| extend ReviewDate = AdditionalDetails[15].value
+| extend ReviewResult = AdditionalDetails[16].value
+| extend Justification = AdditionalDetails[17].value
+| extend ReviewerName = AdditionalDetails[19].value
+| extend ReviewerEmail = AdditionalDetails[21].value
+| extend AccessRecommendation = AdditionalDetails[22].value
+| extend InitiatedBy_App = InitiatedBy.app.displayName
+| extend TargetResourceType = TargetResources[0].type
 | project
     TimeGenerated,
     Identity,
-    InitiatedBy_User,
-    InitiatedBy_UserEmail,
-    InitiatedBy_UserType,
-    LoggedByService,
-    TargetResource,
-    TargetResourceType,
+    ResourceName,
+    ResourceOwnerName,
+    ResourceOwnerEmail,
     TargetUser,
     TargetUserEmail,
-    TargetUserType,
-    Result,
+    ReviewName,
+    ReviewType,
+    ReviewStatus,
+    ReviewerName,
+    ReviewerEmail,
+    ReviewResult,
     Justification,
-    ActivityDisplayName,
+    ReviewDate,
+    AccessRecommendation,
+    Result,
+    InitiatedBy_App,
+    TargetResourceType,
+    LoggedByService,
     OperationName
 | order by TimeGenerated desc
